@@ -4,8 +4,9 @@ import {colors} from "../styles/color";
 export const Section = styled.section`
 	width: 100%;
 	height: auto;
-	padding: 0 15% 0 15%;
+	padding: 0 15% 15px 15%;
 	counter-increment: section 1;
+	color: ${colors.slate};
 `
 
 export const SectionTitle = styled.h1`
@@ -15,7 +16,6 @@ export const SectionTitle = styled.h1`
     align-items: center;
     position: relative;
     margin: 40px 15px 50px;
-    width: 100%;
     font-size: clamp(26px,5vw,32px);
     white-space: nowrap;
 	color: ${colors.lightestslate};

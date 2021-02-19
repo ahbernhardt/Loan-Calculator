@@ -15,7 +15,7 @@ function BasicForm() {
     const [userValues, setUserValues] = useState({
         amount: '',
         interest: '',
-        years: '',
+        months: '',
     })
     // state to storage the results of the calculation
     const [results, setResults] = useState({
@@ -43,18 +43,18 @@ function BasicForm() {
 
     // Manage validations and error messages
     const isValid = () => {
-        const {amount, interest, years} = userValues;
+        const {amount, interest, months} = userValues;
         let actualError = '';
-        // Validate if there are values
-        if (!amount || !interest || !years) {
-            actualError = 'All the values are required';
-        }
-        // Validate if the values are numbers
-        if (isNaN(amount) || isNaN(interest) || isNaN(years)) {
+
+        // if (!amount || !interest || !months) {
+        //     actualError = 'All the values are required';
+        // }
+
+        if (isNaN(amount) || isNaN(interest) || isNaN(months)) {
             actualError = 'All the values must be a valid number';
         }
-        // Validate if the values are positive numbers
-        if (Number(amount) < 0 || Number(interest) < 0 || Number(years) < 0) {
+
+        if (Number(amount) < 0 || Number(interest) < 0 || Number(months) < 0) {
             actualError = 'All the values must be a positive number';
         }
         if (actualError) {
@@ -64,40 +64,48 @@ function BasicForm() {
         return true;
     };
 
-    // // Handle the data submited - validate inputs and send it as a parameter to the function that calculates the loan
-    // function handleSubmitValues(e){
-    //     e.preventDefault();
-    //     if (isValid()) {
-    //         setError('');
-    //         calculateResults(userValues);
-    //     }
-    // }
 
     // Calculation
-    const calculateResults = ({amount, interest, years}) => {
-        const PrincipalAmount = Number(amount);
-        const monthlyAPR = Number(interest) / 1200;
-        const numberMonths = Number(years) * 12;
+    const calculateResults = ({amount, interest, months}) => {
 
-        // (PrincipalAmount * monthlyAPR) / (1 - Math.pow(1 + monthlyAPR, -NumberOfMonths))
-        const x = Math.pow(1 + monthlyAPR, -(numberMonths));
-        const monthly = (PrincipalAmount * monthlyAPR) / (1 - x);
+        if(Number(interest) > 0){
+            const PrincipalAmount = Number(amount);
+            const monthlyAPR = Number(interest) / 1200;
+            const numberMonths = Number(months);
+            const x = Math.pow(1 + monthlyAPR, -(numberMonths));
+            const monthly = (PrincipalAmount * monthlyAPR) / (1 - x);
 
-        if (isFinite(monthly)) {
-            const monthlyPaymentCalculated = monthly.toFixed(2);
-            const totalPaymentCalculated = (monthly * numberMonths).toFixed(2);
-            const totalInterestCalculated = (
-                monthly * numberMonths -
-                PrincipalAmount
-            ).toFixed(2);
+            if (isFinite(monthly)) {
+                const monthlyPaymentCalculated = monthly.toFixed(2);
+                const totalPaymentCalculated = (monthly * numberMonths).toFixed(2);
+                const totalInterestCalculated = (totalPaymentCalculated - PrincipalAmount).toFixed(2);
 
-            // Set up results to the state to be displayed to the user
-            setResults({
-                monthlyPayment: monthlyPaymentCalculated,
-                totalPayment: totalPaymentCalculated,
-                totalInterest: totalInterestCalculated,
-                isResult: true,
-            });
+                // Set up results to the state to be displayed to the user
+                setResults({
+                    monthlyPayment: monthlyPaymentCalculated,
+                    totalPayment: totalPaymentCalculated,
+                    totalInterest: totalInterestCalculated,
+                    isResult: true,
+                });
+            }
+        } else if ((Number(interest) === 0.0) && ((Number(amount) % Number(months)) === 0)) {
+            const PrincipalAmount = Number(amount);
+            const numberMonths = Number(months);
+            const monthly = PrincipalAmount/ numberMonths;
+
+            if (isFinite(monthly)) {
+                const monthlyPaymentCalculated = monthly.toFixed(2);
+                const totalPaymentCalculated = (monthly * numberMonths).toFixed(2);
+                const totalInterestCalculated = (monthly * numberMonths - PrincipalAmount).toFixed(2);
+
+                // Set up results to the state to be displayed to the user
+                setResults({
+                    monthlyPayment: monthlyPaymentCalculated,
+                    totalPayment: totalPaymentCalculated,
+                    totalInterest: totalInterestCalculated,
+                    isResult: true,
+                });
+            }
         }
         // return;
     };
@@ -115,7 +123,7 @@ function BasicForm() {
             <CalculatorFormInput>
                 <InputWrapper>
                     <FormInput>
-                        <label>Loan Amount:</label>
+                        <label>Loan Amount</label>
                            <InputBox
                                type='text'
                                name='amount'
@@ -125,22 +133,24 @@ function BasicForm() {
                            />
                     </FormInput>
                     <FormInput>
-                        <label>Rate (APR):</label>
+                        <label>Interest Rate</label>
                         <InputBox
-                            type='text'
+                            type='number'
                             name='interest'
-                            placeholder='7%'
+                            step="0.01" min="0"
+                            placeholder='7.0'
                             value={userValues.interest}
                             onChange={handleInputChange}
                         />
                     </FormInput>
                     <FormInput>
-                        <label>Term:<small> (# of year)</small></label>
+                        <label>Term<small> (# of month)</small></label>
                         <InputBox
-                            type='text'
-                            name='years'
-                            placeholder='36m'
-                            value={userValues.years}
+                            type='number'
+                            name='months'
+                            placeholder='12'
+                            min="1"
+                            value={userValues.months}
                             onChange={handleInputChange}
                         />
                     </FormInput>
@@ -150,13 +160,9 @@ function BasicForm() {
 
             <ResultSide>
                 <ResultLabel>Results:</ResultLabel>
-                {/*<h4>*/}
-                {/*    Loan amount: ${userValues.amount} <br/> Interest:{' '}*/}
-                {/*    {userValues.interest}% <br/> Years to repay: {userValues.years}*/}
-                {/*</h4>*/}
                 <InputWrapper>
                     <FormInput>
-                        <label>Months Payment:</label>
+                        <label>Months Payment</label>
                         <InputBox
                             type='text'
                             value={results.monthlyPayment}
@@ -164,19 +170,18 @@ function BasicForm() {
                         />
                     </FormInput>
                     <FormInput>
-                        <label>Total Payment:</label>
+                        <label>Total Interest</label>
                         <InputBox
                             type='text'
-                            value={results.totalPayment}
+                            value={results.totalInterest}
                             disabled
                         />
                     </FormInput>
                     <FormInput>
-                        <label>Total Interest:</label>
+                        <label>Total Amount + Interest</label>
                         <InputBox
                             type='text'
-                            value={results.totalInterest}
-
+                            value={results.totalPayment}
                             disabled
                         />
                     </FormInput>

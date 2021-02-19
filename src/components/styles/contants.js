@@ -4,12 +4,14 @@ import {colors} from "./color";
 export const FormWrapper = styled.div`
 	display: block;
 	color: ${colors.slate};
+	padding-bottom: 75px;
 `
 export const Info = styled.div`
 	display: block;
 `
 export const InfoPara = styled.p`
 	margin-left: 25px;
+	color: ${colors.slate};
 	
 	::before {
 	  content: "▹";
@@ -25,7 +27,7 @@ export const FormTitle = styled.h2`
 
 export const CalculationForm = styled.div`
 	display: block;
-	margin-top: 75px;
+	margin-top: 50px;
 `
 export const CalculatorFormInput = styled.div`
 	display: block;
@@ -40,13 +42,14 @@ export const FormInput = styled.div`
 	display: block;
 	
 	label {
+	  font-size: .95em;
 	  margin-bottom: 5px;
 	  display: block;
 	  color: ${colors.lightestslate}
 	}
 	
 	small {
-	  font-size: .85em;
+	  font-size: .75em;
 	  color: lighten( $grey, 10% );
 	}
 `
