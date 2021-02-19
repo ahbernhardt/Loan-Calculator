@@ -1,13 +1,13 @@
 import styled from 'styled-components';
 import { styled as styledTabTab } from 'react-tabtab';
-import {colors} from './color'
+import {colors} from './styles/color'
 
 let {TabListStyle, ActionButtonStyle, TabStyle, PanelStyle} = styledTabTab;
 
 TabListStyle = styled(TabListStyle)`
   background-color: transparent;
   border: 0;
-  width: 30%;
+  width: 360px;
 `;
 
 TabStyle = styled(TabStyle)`
@@ -38,12 +38,12 @@ ActionButtonStyle = styled(ActionButtonStyle)`
 
 PanelStyle = styled(PanelStyle)`
   width: 70%;
-  align-items: right;
   right: 0;
-  margin-top: -15%;
-  margin-left: 28%;
+  margin-top: -175px;
+  margin-left: 350px;
   transition: box-shadow .25s, -webkit-box-shadow .25s;
   background-color: transparent;
+  // border: 1px solid  ${colors.lightestnavy};
 `;
 
 export default {

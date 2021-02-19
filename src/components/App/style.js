@@ -1,10 +1,11 @@
 import styled from "styled-components";
-import {colors} from "../color";
+import {colors} from "../styles/color";
 
 export const Section = styled.section`
-	height: auto;
 	width: 100%;
-	padding: 0 2% 0 2%;
+	height: auto;
+	padding: 0 15% 0 15%;
+	counter-increment: section 1;
 `
 
 export const SectionTitle = styled.h1`
@@ -22,7 +23,6 @@ export const SectionTitle = styled.h1`
 	::before{
 	  position: relative;
 	  bottom: 4px;
-	  counter-increment: section 1;
 	  content: "" counter(section) ".";
 	  margin-right: 10px;
 	  color: ${colors.green};

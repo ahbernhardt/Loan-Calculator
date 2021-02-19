@@ -1,12 +1,20 @@
 import React from 'react';
-import {InterestFormWrapper, CalculationForm, CalculatorFormInput, FormInput, FormTitle, Info, ResultSide} from "./style";
+import {
+  FormWrapper,
+  CalculationForm,
+  CalculatorFormInput,
+  FormTitle,
+  Info, InfoPara,
+  ResultSide,
+  FormInput
+} from "../styles/contants"
 
 export default function InterestForm() {
   return (
-	  <InterestFormWrapper>
+	  <FormWrapper>
 		<Info>
 		  <FormTitle>Interest Savings Calculation</FormTitle>
-		  <p>Grabs four values from the form, and returns general information about a loan.</p>
+		  <InfoPara>Grabs four values from the form, and returns general information about a loan.</InfoPara>
 		</Info>
 
 		<CalculationForm>
@@ -46,6 +54,6 @@ export default function InterestForm() {
 		  </ResultSide>
 		  <div className="clear"/>
 		</CalculationForm>
-	  </InterestFormWrapper>
+	  </FormWrapper>
   )
 }

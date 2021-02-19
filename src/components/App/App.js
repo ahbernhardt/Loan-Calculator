@@ -929,7 +929,10 @@ import {Section, SectionTitle} from "./style";
 export default function App(){
   return (
       <div className="App">
-          <Section>
+        <Section>
+          <SectionTitle>Background</SectionTitle>
+        </Section>
+        <Section>
             <SectionTitle>Calculation Demos</SectionTitle>
               <Tabs customStyle={customStyle} >
                   <TabList>
@@ -937,6 +940,7 @@ export default function App(){
                     <Tab>Interest Savings Calculation</Tab>
                     <Tab>Amortization Schedule Calculation</Tab>
                   </TabList>
+
                   <PanelList>
                     <Panel>
                       <BasicForm />

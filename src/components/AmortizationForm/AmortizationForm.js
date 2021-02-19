@@ -1,21 +1,13 @@
 import React from 'react';
-import {
-  AmortizationFormWrapper,
-  CalculationForm,
-  CalculatorFormInput,
-  FormInput,
-  FormTitle,
-  Info, Result,
-  ResultSide,
-  ResultTable
-} from "./style";
+import {Result, ResultTable} from "./style";
+import {FormWrapper, CalculationForm, CalculatorFormInput, FormTitle, Info, InfoPara,  ResultSide, FormInput} from "../styles/contants"
 
 export default function AmortizationForm() {
   return (
-	  <AmortizationFormWrapper>
+	  <FormWrapper>
 		<Info>
 		  <FormTitle>Interest Savings Calculation</FormTitle>
-		  <p>Grabs three values from the form, and displays a complete amortization schedule for the provided loan information.</p>
+		  <InfoPara>Grabs three values from the form, and displays a complete amortization schedule for the provided loan information.</InfoPara>
 		</Info>
 
 		<CalculationForm>
@@ -76,6 +68,6 @@ export default function AmortizationForm() {
 		  </ResultSide>
 		  <div className="clear"/>
 		</CalculationForm>
-	  </AmortizationFormWrapper>
+	  </FormWrapper>
   )
 }
