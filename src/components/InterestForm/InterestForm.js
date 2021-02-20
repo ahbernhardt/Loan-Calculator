@@ -43,19 +43,23 @@ export default function InterestForm() {
 
   // Manage validations and error messages
   const isValid = () => {
-	const {amount, interest, months} = userValues;
+	const {amount, interest, months, rate_compare} = userValues;
 	let actualError = '';
 
 	// if (!amount || !interest || !months) {
 	//     actualError = 'All the values are required';
 	// }
 
-	if (isNaN(amount) || isNaN(interest) || isNaN(months)) {
+	if (isNaN(amount) || isNaN(interest) || isNaN(months) || isNaN(rate_compare)) {
 	  actualError = 'All the values must be a valid number';
 	}
 
-	if (Number(amount) < 0 || Number(interest) < 0 || Number(months) < 0) {
+	if (Number(amount) < 0 || Number(interest) < 0 || Number(months) < 0 || Number(rate_compare) < 0) {
 	  actualError = 'All the values must be a positive number';
+	}
+
+	if  (Number(interest) === 0) {
+	  actualError = 'There is no interest payment in this Loan';
 	}
 	if (actualError) {
 	  setError(actualError);
@@ -68,21 +72,19 @@ export default function InterestForm() {
   // Calculation
   const calculateResults = ({amount, interest, months, rate_compare}) => {
 
-	if (Number(interest) > 0) {
+	if ((Number(interest) > 0.0) && (Number(rate_compare) > 0)) {
 	  //Current rate
 	  const PrincipalAmount = Number(amount);
 	  const monthlyAPR = Number(interest) / 1200;
 	  const numberMonths = Number(months);
 	  const x = Math.pow(1 + monthlyAPR, -(numberMonths));
 	  const monthly = (PrincipalAmount * monthlyAPR) / (1 - x);
-	  // const monthlyPaymentCalculated = monthly.toFixed(2);
 	  const totalPaymentCalculated = (monthly * numberMonths).toFixed(2);
 
 	  //Compare rate
 	  const compareAPR = Number(rate_compare) / 1200;
 	  const rc = Math.pow(1 + compareAPR, -(numberMonths));
 	  const rc_monthly = (PrincipalAmount * compareAPR) / (1 - rc);
-	  // const rc_monthlyPayment = rc_monthly.toFixed(2);
 	  const rc_totalPayment = (rc_monthly * numberMonths).toFixed(2);
 
 	  if ((isFinite(monthly)) && (isFinite(rc_monthly))) {
@@ -98,17 +100,22 @@ export default function InterestForm() {
 		  isResult: true,
 		});
 	  }
-	} else if ((Number(interest) === 0.0) && (Number(rate_compare) === 0.0) && ((Number(amount) % Number(months)) === 0)) {
-	  const PrincipalAmount = Number(amount);
+	} else if ((Number(interest) > 0.0) && (Number(rate_compare) === 0)){
+	  //Current rate
+	  const Amount = Number(amount);
+	  const monthlyAPR = Number(interest) / 1200;
 	  const numberMonths = Number(months);
-	  const monthly = PrincipalAmount / numberMonths;
-	  const totalInterestCalculated = (monthly * numberMonths - PrincipalAmount).toFixed(2);
-	  if (isFinite(monthly)) {
-		// Set up results to the state to be displayed to the user
+	  const x = Math.pow(1 + monthlyAPR, -(numberMonths));
+	  const monthly = (Amount * monthlyAPR) / (1 - x);
+	  const totalPaymentCalculated = (monthly * numberMonths).toFixed(2);
+
+	  if ((isFinite(monthly))) {
+		const totalInterestCalculated = (totalPaymentCalculated - Amount).toFixed(2);
+
 		setResults({
 		  totalCurrentInterest: totalInterestCalculated,
 		  totalCompareInterest: totalInterestCalculated,
-		  totalSaveInterest: '',
+		  totalSaveInterest: '0.0',
 		  isResult: true,
 		});
 	  }
@@ -136,17 +143,19 @@ export default function InterestForm() {
 					onChange={handleInputChange}
 				/>
 			  </FormInput>
+
 			  <FormInput>
 				<label>Interest Rate</label>
 				<InputBox
 					type='number'
 					name='interest'
-					step="0.01" min="0"
+					step="0.1" min="0.0"
 					placeholder='7.0'
 					value={userValues.interest}
 					onChange={handleInputChange}
 				/>
 			  </FormInput>
+
 			  <FormInput>
 				<label>Term<small> (# of month)</small></label>
 				<InputBox
@@ -158,17 +167,20 @@ export default function InterestForm() {
 					onChange={handleInputChange}
 				/>
 			  </FormInput>
+
 			  <FormInput>
 				<label>Comparison Rate</label>
 				<InputBox
-					type='number'
+					type='text'
 					name='rate_compare'
-					placeholder='1.49'
-					min="1"
+					placeholder='1.0'
+					min='0'
 					value={userValues.rate_compare}
 					onChange={handleInputChange}
 				/>
+				<small> decimal input format</small>
 			  </FormInput>
+
 			</InputWrapper>
 			<p className='error'>{error}</p>
 		  </CalculatorFormInput>

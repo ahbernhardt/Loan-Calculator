@@ -8,6 +8,7 @@ TabListStyle = styled(TabListStyle)`
   background-color: transparent;
   border: 0;
   width: 360px;
+  margin-left: -25px;
 `;
 
 TabStyle = styled(TabStyle)`
