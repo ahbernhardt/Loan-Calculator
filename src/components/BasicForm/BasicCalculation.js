@@ -15,46 +15,50 @@ function BasicForm() {
     const [userValues, setUserValues] = useState({
         amount: '',
         interest: '',
-        months: '',
+        years: ''
     })
     // state to storage the results of the calculation
     const [results, setResults] = useState({
         monthlyPayment: '',
         totalPayment: '',
-        totalInterest: '',
+        totalInterest: ''
     });
 
     // state to storage error message
     const [error, setError] = useState('');
 
+    const CurrencyFormatter = new Intl.NumberFormat('us-US', {
+        style: 'currency',
+        currency: 'USD',
+    });
     // event handler to update state when the user enters values
-    function handleInputChange (event) {
+    function handleInputChange(event) {
         const value = event.target.value;
         setUserValues({
             ...userValues,
-            [event.target.name]: value
-        });
+            [event.target.name]: parseFloat(value)
+        })
         event.preventDefault();
         if (isValid()) {
-            setError('');
+            setError('')
             calculateResults(userValues);
         }
     }
 
     // Manage validations and error messages
     const isValid = () => {
-        const {amount, interest, months} = userValues;
-        let actualError = '';
+        const {amount, interest, years} = userValues;
+        let actualError ='';
 
-        // if (!amount || !interest || !months) {
+        // if (!amount || !interest || !years) {
         //     actualError = 'All the values are required';
         // }
 
-        if (isNaN(amount) || isNaN(interest) || isNaN(months)) {
+        if (isNaN(amount) || isNaN(interest) || isNaN(years) ){
             actualError = 'All the values must be a valid number';
         }
 
-        if (Number(amount) < 0 || Number(interest) < 0 || Number(months) < 0) {
+        if (Number(amount) < 0 || Number(interest) < 0 || Number(years) < 0) {
             actualError = 'All the values must be a positive number';
         }
         if (actualError) {
@@ -66,49 +70,24 @@ function BasicForm() {
 
 
     // Calculation
-    const calculateResults = ({amount, interest, months}) => {
+    const calculateResults = ({amount, interest, years}) => {
+        const PrincipalAmount = amount;
+        const monthlyRate = interest / (100 * 12);
+        const numberMonths = years * 12;
+        const ratePower = Math.pow((1 + monthlyRate), numberMonths);
 
-        if(Number(interest) > 0){
-            const PrincipalAmount = Number(amount);
-            const monthlyAPR = Number(interest) / 1200;
-            const numberMonths = Number(months);
-            const x = Math.pow(1 + monthlyAPR, -(numberMonths));
-            const monthly = (PrincipalAmount * monthlyAPR) / (1 - x);
-
-            if (isFinite(monthly)) {
-                const monthlyPaymentCalculated = monthly.toFixed(2);
-                const totalPaymentCalculated = (monthly * numberMonths).toFixed(2);
-                const totalInterestCalculated = (totalPaymentCalculated - PrincipalAmount).toFixed(2);
-
-                // Set up results to the state to be displayed to the user
-                setResults({
-                    monthlyPayment: monthlyPaymentCalculated,
-                    totalPayment: totalPaymentCalculated,
-                    totalInterest: totalInterestCalculated,
-                    isResult: true,
-                });
-            }
-        } else if ((Number(interest) === 0.0) && ((Number(amount) % Number(months)) === 0)) {
-            const PrincipalAmount = Number(amount);
-            const numberMonths = Number(months);
-            const monthly = PrincipalAmount/ numberMonths;
-
-            if (isFinite(monthly)) {
-                const monthlyPaymentCalculated = monthly.toFixed(2);
-                const totalPaymentCalculated = (monthly * numberMonths).toFixed(2);
-                const totalInterestCalculated = (monthly * numberMonths - PrincipalAmount).toFixed(2);
-
-                // Set up results to the state to be displayed to the user
-                setResults({
-                    monthlyPayment: monthlyPaymentCalculated,
-                    totalPayment: totalPaymentCalculated,
-                    totalInterest: totalInterestCalculated,
-                    isResult: true,
-                });
-            }
+        const monthly = PrincipalAmount * ((monthlyRate * ratePower) / (ratePower - 1));
+        if (isFinite(monthly)) {
+            const totalPaymentCalculated = (monthly * numberMonths);
+            const totalInterestCalculated = (totalPaymentCalculated - PrincipalAmount);
+            // Set up results to the state to be displayed to the user
+            setResults({
+                monthlyPayment: CurrencyFormatter.format(monthly),
+                totalPayment: CurrencyFormatter.format(totalPaymentCalculated),
+                totalInterest: CurrencyFormatter.format(totalInterestCalculated),
+            });
         }
-        // return;
-    };
+    }
 
     return (
     <FormWrapper>
@@ -123,13 +102,14 @@ function BasicForm() {
             <CalculatorFormInput>
                 <InputWrapper>
                     <FormInput>
-                        <label>Loan Amount</label>
+                        <label>Amount</label>
                            <InputBox
-                               type='text'
+                               type='number'
                                name='amount'
-                               placeholder='7,500'
+                               placeholder='7500'
                                value={userValues.amount}
                                onChange={handleInputChange}
+                               // onKeyPress={handleInputKeyPress}
                            />
                     </FormInput>
                     <FormInput>
@@ -137,21 +117,26 @@ function BasicForm() {
                         <InputBox
                             type='number'
                             name='interest'
-                            step="0.01" min="0"
-                            placeholder='7.0'
+                            placeholder='3'
+                            inputmode='numeric'
+                            pattern="[0-9]{.1}"
                             value={userValues.interest}
                             onChange={handleInputChange}
+                            // onKeyPress={handleInputKeyPress}
                         />
                     </FormInput>
                     <FormInput>
-                        <label>Term<small> (# of month)</small></label>
+                        <label>Term<small> (in decimal format)</small></label>
                         <InputBox
                             type='number'
-                            name='months'
-                            placeholder='12'
-                            min="1"
-                            value={userValues.months}
+                            name='years'
+                            placeholder='years'
+                            min='0.0'
+                            step='0.1'
+                            inputmode='numeric'
+                            value={userValues.years}
                             onChange={handleInputChange}
+                            // onKeyPress={handleInputKeyPress}
                         />
                     </FormInput>
                 </InputWrapper>

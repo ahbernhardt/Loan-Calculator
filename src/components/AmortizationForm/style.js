@@ -14,6 +14,7 @@ export const Result = styled.table`
     color: ${colors.lightestslate};
     
 	th {
+	  text-align: center;
 	  white-space: nowrap;
 	  padding: 2px 10px;
 	  border-right: solid 1px ${colors.lightnavy};

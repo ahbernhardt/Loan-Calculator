@@ -47,6 +47,7 @@ PanelStyle = styled(PanelStyle)`
   // border: 1px solid  ${colors.lightestnavy};
 `;
 
+// eslint-disable-next-line import/no-anonymous-default-export
 export default {
     TabList: TabListStyle,
     ActionButton: ActionButtonStyle,

@@ -11,21 +11,21 @@ import {
   FormInput,
   InputWrapper, InputBox
 } from "../styles/contants"
-import BasicForm from "../BasicForm/BasicCalculation";
 
 function AmortizationForm() {
   const [userValues, setUserValues] = useState({
 	amount: '',
 	interest: '',
-	months: '',
+	years: '',
   })
 
   const [results, setResults] = useState({
-	paymentNumber: '',
-	paymentAmount: '',
-	totalInterest: '',
-	totalPayment: '',
-	balance: '',
+	amortizationSchedule: []
+  });
+
+  const CurrencyFormatter = new Intl.NumberFormat('us-US', {
+	style: 'currency',
+	currency: 'USD',
   });
 
   const [error, setError] = useState('');
@@ -34,8 +34,8 @@ function AmortizationForm() {
 	const value = event.target.value;
 	setUserValues({
 	  ...userValues,
-	  [event.target.name]: value
-	});
+	  [event.target.name]: Number(value)
+	})
 	event.preventDefault();
 	if (isValid()) {
 	  setError('');
@@ -43,15 +43,21 @@ function AmortizationForm() {
 	}
   }
 
+  const handleInputKeyPress = event => {
+	if (event.key === 'Enter') {
+	  console.log('Enter key pressed' + event.target.value);
+	}
+  }
+
   const isValid = () => {
-	const {amount, interest, months} = userValues;
+	const {amount, interest, years} = userValues;
 	let actualError = '';
 
-	if (isNaN(amount) || isNaN(interest) || isNaN(months)) {
+	if (isNaN(amount) || isNaN(interest) || isNaN(years)) {
 	  actualError = 'All the values must be a valid number';
 	}
 
-	if (Number(amount) < 0 || Number(interest) < 0.0 || Number(months) < 0) {
+	if (amount < 0 || interest < 0 || years < 0) {
 	  actualError = 'All the values must be a positive number';
 	}
 	if (actualError) {
@@ -62,126 +68,130 @@ function AmortizationForm() {
   };
 
   // Calculation
-  const calculateResults = ({amount, interest, months}) => {
-	if (Number(interest) > 0.0) {
-	  const LoanAmount = Number(amount);
-	  const monthlyAPR = Number(interest) / 1200;
-	  const num_payments = Number(months);
+  const calculateResults = ({amount, interest, years}) => {
+	  const principal = amount;
+	  const monthlyAPR = interest/(100*12);
+	  const durationMonths = years * 12;
 
-	  const x = Math.pow(1 + monthlyAPR, -(num_payments));
-	  const payment_amount = (LoanAmount * monthlyAPR) / (1 - x);
+	  // const monthly_payment_amount = (principal * (monthlyAPR +
+		//   monthlyAPR / (Math.pow(monthlyAPR + 1, durationMonths) - 1)));
+	const ratePower = Math.pow((1 + monthlyAPR), durationMonths);
 
-	  if (isFinite(payment_amount)) {
-		const payment_amount_formatted = payment_amount.toFixed(2);
+	const monthly_payment_amount = principal * ((monthlyAPR * ratePower) / (ratePower - 1));
+	// const monthly_payment_amount = principal * (monthlyAPR + monthlyAPR / (Math.pow(monthlyAPR + 1, durationMonths) - 1));
 
-		const totalInterest = ((payment_amount * num_payments) - LoanAmount);
-		const totalInterest_Formatted = totalInterest.toFixed(2);
+	  const amortizationSchedule = [];
+	  for (let i = 0; i < durationMonths; i++) {
+		const prevPrincipal =
+			i === 0 ? principal : amortizationSchedule[i - 1].principalBalance;
+		const interestPayment = prevPrincipal * monthlyAPR;
+		const principalPayment = monthly_payment_amount - interestPayment;
+		const principalBalance = Math.max(prevPrincipal - principalPayment, 0);
+		const accInterest =
+			(i === 0 ? 0 : amortizationSchedule[i - 1].accInterest) +
+			interestPayment;
 
-		const totalPayment = (payment_amount * num_payments);
-		const totalPayment_Formatted = totalPayment.toFixed(2);
+		amortizationSchedule.push({
+		  paymentNumber: i + 1,
+		  payment: monthly_payment_amount,
+		  principalBalance: principalBalance,
+		  interestPayment: interestPayment,
+		  principalPayment: principalPayment,
+		  accInterest: accInterest,
 
-
-		const interest_per_payment = (payment_amount - (LoanAmount / num_payments));
-		const interest_per_payment_Formatted = (payment_amount - (LoanAmount / num_payments)).toFixed(2);
-		const amount_from_balance = payment_amount - interest_per_payment;
-		// let counter_interest = 0;
-		// let counter_payment = 0;
-		const counter_balance = parseInt(LoanAmount, 10);
-		const count_balance = counter_balance - amount_from_balance;
-
-		setResults({
-		  // paymentNumber: '',
-		  // paymentAmount: '',
-		  // totalInterest: '',
-		  // totalPayment: '',
-		  // balance: '',
-		  paymentNumber: num_payments,
-		  paymentAmount: payment_amount_formatted,
-		  totalInterest: interest_per_payment_Formatted,
-		  totalPayment: totalPayment_Formatted,
-		  balance: count_balance.toFixed(2),
-		  isResult: true,
+		  paymentRounded: CurrencyFormatter.format(monthly_payment_amount),
+		  interestPaymentRounded: CurrencyFormatter.format(interestPayment),
+		  principalPaymentRounded: CurrencyFormatter.format(principalPayment),
+		  principalBalanceRounded: CurrencyFormatter.format(principalBalance),
+		  accInterestRounded: CurrencyFormatter.format(accInterest),
 		});
 	  }
-	}
+	  setResults({
+		amortizationSchedule: amortizationSchedule,
+	  });
   }
 
-	return (
-		<FormWrapper>
-		  <Info>
-			<FormTitle>Interest Savings Calculation</FormTitle>
-			<InfoPara>Grabs three values from the form, and displays a complete amortization schedule for the provided
-			  loan information.</InfoPara>
-		  </Info>
+  return (
+	  <FormWrapper>
+		<Info>
+		  <FormTitle>Interest Savings Calculation</FormTitle>
+		  <InfoPara>Grabs three values from the form, and displays a complete amortization schedule for the provided
+			loan information.</InfoPara>
+		</Info>
 
-		  <CalculationForm>
-			<CalculatorFormInput>
-			  <InputWrapper>
-				<FormInput>
-				  <label>Loan Amount</label>
-				  <InputBox
-					  type='text'
-					  name='amount'
-					  placeholder='7,500'
-					  value={userValues.amount}
-					  onChange={handleInputChange}
-				  />
-				</FormInput>
-				<FormInput>
-				  <label>Interest Rate</label>
-				  <InputBox
-					  type='number'
-					  name='interest'
-					  step="0.1" min="0.0"
-					  placeholder='7.0'
-					  value={userValues.interest}
-					  onChange={handleInputChange}
-				  />
-				</FormInput>
-				<FormInput>
-				  <label>Term<small> (# of month)</small></label>
-				  <InputBox
-					  type='number'
-					  name='months'
-					  placeholder='12'
-					  min="1"
-					  value={userValues.months}
-					  onChange={handleInputChange}
-				  />
-				</FormInput>
-			  </InputWrapper>
-			  <p className='error'>{error}</p>
-			</CalculatorFormInput>
+		<CalculationForm>
+		  <CalculatorFormInput>
+			<InputWrapper>
+			  <FormInput>
+				<label>Loan Amount</label>
+				<InputBox
+					type='number'
+					name='amount'
+					placeholder='7500'
+					value={userValues.amount}
+					onChange={handleInputChange}
+					onKeyPress={handleInputKeyPress}
+				/>
+			  </FormInput>
+			  <FormInput>
+				<label>Interest Rate</label>
+				<InputBox
+					type='number'
+					name='interest'
+					placeholder='3'
+					value={userValues.interest}
+					onChange={handleInputChange}
+					onKeyPress={handleInputKeyPress}
+				/>
+			  </FormInput>
+			  <FormInput>
+				<label>Term<small> (in decimal format)</small></label>
+				<InputBox
+					type='number'
+					name='years'
+					placeholder='years'
+					min='1.0'
+					value={userValues.years}
+					onChange={handleInputChange}
+					onKeyPress={handleInputKeyPress}
+				/>
+			  </FormInput>
+			</InputWrapper>
+			<p className='error'>{error}</p>
+		  </CalculatorFormInput>
 
-			<ResultSide>
-			  <p><label>Results:</label></p>
-			  <ResultTable>
-				<Result>
-				  <thead>
-				  <tr>
-					<th>#</th>
-					<th>Payment Amt.</th>
-					<th>Total Interest</th>
-					<th>Total Payments</th>
-					<th>Balance</th>
-				  </tr>
-				  </thead>
-				  <tbody>
-				  <tr>
-					<td>{results.paymentNumber}</td>
-					<td>{results.paymentAmount}</td>
-					<td>{results.totalInterest}</td>
-					<td>{results.totalPayment}</td>
-					<td>{results.balance}</td>
-				  </tr>
-				  </tbody>
-				</Result>
-			  </ResultTable>
-			</ResultSide>
-			<div className="clear"/>
-		  </CalculationForm>
-		</FormWrapper>
-	)
-  }
-
+		  <ResultSide>
+			<p><label>Results:</label></p>
+			<ResultTable>
+			  <Result>
+				<thead>
+				<tr>
+				  <th>#</th>
+				  <th>Payment</th>
+				  <th>Principal</th>
+				  <th>Interest</th>
+				  <th>Balance</th>
+				  {/*<th>Accumulated Interest</th>*/}
+				</tr>
+				</thead>
+				<tbody>
+				{results.amortizationSchedule.map(row => (
+					<tr key={row.paymentNumber}>
+					  <td>{row.paymentNumber}</td>
+					  <td>{row.paymentRounded}</td>
+					  <td>{row.principalPaymentRounded}</td>
+					  <td>{row.interestPaymentRounded}</td>
+					  <td>{row.principalBalanceRounded}</td>
+					  {/*<td>{row.accInterestRounded}</td>*/}
+					</tr>
+				))}
+				</tbody>
+			  </Result>
+			</ResultTable>
+		  </ResultSide>
+		  <div className="clear"/>
+		</CalculationForm>
+	  </FormWrapper>
+  )
+}
 export default AmortizationForm;
