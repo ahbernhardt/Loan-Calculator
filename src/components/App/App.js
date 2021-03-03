@@ -5,7 +5,7 @@ import customStyle from '../TabStyles';
 import BasicForm from "../BasicForm/BasicCalculation";
 import InterestForm from "../InterestForm/InterestForm";
 import AmortizationForm from "../AmortizationForm/AmortizationForm";
-import {Section, SectionTitle} from "./style";
+import {Footer, Section, SectionTitle} from "./style";
 import { Info, InfoPara} from "../styles/contants";
 
 export default function App(){
@@ -43,6 +43,27 @@ export default function App(){
                   </PanelList>
               </Tabs>
           </Section>
+        <Footer>
+          <p>
+            2020 ©
+            <a href="https://anhnguyen.page" target="_blank" rel="noopener noreferrer">
+              <span>
+                anhnguyen.page
+              </span>
+            </a>
+             |  Repo Link: {'  '}
+            <a
+               href="https://github.com/anguyen0208/Loan-Calculator"
+               target="_blank"
+               rel="noopener noreferrer">
+              <span>
+                <i className="fa fa-github"/>
+              </span>
+
+            </a>
+
+          </p>
+        </Footer>
       </div>
   )
 }

@@ -42,7 +42,7 @@ export const FormInput = styled.div`
 	display: block;
 	
 	label {
-	  font-size: .95em;
+	  font-size: .85em;
 	  margin-bottom: 5px;
 	  display: block;
 	  color: ${colors.lightestslate}

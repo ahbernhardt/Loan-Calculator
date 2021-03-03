@@ -163,7 +163,7 @@ function BasicForm() {
                         />
                     </FormInput>
                     <FormInput>
-                        <label>Total Amount + Interest</label>
+                        <label>Amount + Interest</label>
                         <InputBox
                             type='text'
                             value={results.totalPayment}

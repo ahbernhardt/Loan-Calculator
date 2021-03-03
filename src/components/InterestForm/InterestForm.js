@@ -138,7 +138,7 @@ export default function InterestForm() {
 		  <CalculatorFormInput>
 			<InputWrapper>
 			  <FormInput>
-				<label>Loan Amount</label>
+				<label>Amount</label>
 				<InputBox
 					type='number'
 					name='amount'
@@ -149,7 +149,7 @@ export default function InterestForm() {
 			  </FormInput>
 
 			  <FormInput>
-				<label>Interest Rate</label>
+				<label>Current Rate</label>
 				<InputBox
 					type='number'
 					name='interest'
@@ -161,7 +161,7 @@ export default function InterestForm() {
 			  </FormInput>
 
 			  <FormInput>
-				<label>Term<small> (in decimal format)</small></label>
+				<label>Term</label>
 				<InputBox
 					type='number'
 					name='years'
@@ -171,6 +171,7 @@ export default function InterestForm() {
 					value={userValues.years}
 					onChange={handleInputChange}
 				/>
+				<small> decimal input format</small>
 			  </FormInput>
 
 			  <FormInput>

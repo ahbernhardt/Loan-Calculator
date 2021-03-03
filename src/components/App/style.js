@@ -40,3 +40,28 @@ export const SectionTitle = styled.h1`
 	  background-color: ${colors.lightestnavy};
     }
 `
+export const Footer = styled.footer`
+	text-align: center;
+	padding: 1rem 0 2rem 0;
+	font-size: 1rem;
+	color: ${colors.slate};
+
+   a {
+	margin-left: .5rem;
+   }
+
+  span {
+	display: inline-block;
+	margin-right: .5rem;
+	color: ${colors.green};
+  }
+
+  i {
+	font-size: 1.8rem;
+	margin-right: 4px;
+  }
+
+  span:hover{
+	color:  ${colors.greentint};
+  }
+`

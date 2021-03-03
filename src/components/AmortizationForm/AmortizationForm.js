@@ -123,7 +123,7 @@ function AmortizationForm() {
 		  <CalculatorFormInput>
 			<InputWrapper>
 			  <FormInput>
-				<label>Loan Amount</label>
+				<label>Amount</label>
 				<InputBox
 					type='number'
 					name='amount'
@@ -134,7 +134,7 @@ function AmortizationForm() {
 				/>
 			  </FormInput>
 			  <FormInput>
-				<label>Interest Rate</label>
+				<label>Rate</label>
 				<InputBox
 					type='number'
 					name='interest'
@@ -145,7 +145,7 @@ function AmortizationForm() {
 				/>
 			  </FormInput>
 			  <FormInput>
-				<label>Term<small> (in decimal format)</small></label>
+				<label>Term</label>
 				<InputBox
 					type='number'
 					name='years'
@@ -155,6 +155,7 @@ function AmortizationForm() {
 					onChange={handleInputChange}
 					onKeyPress={handleInputKeyPress}
 				/>
+				<small> decimal input format</small>
 			  </FormInput>
 			</InputWrapper>
 			<p className='error'>{error}</p>
